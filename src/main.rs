@@ -1,8 +1,6 @@
 // -*- coding:utf-8-unix -*-
-// #![feature(map_first_last)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_macros)]
+#![allow(dead_code, unused_imports, unused_macros)]
+// use ac_library::*;
 // use proconio::input;
 use cmp::Ordering::*;
 // use itertools::Itertools;
@@ -17,25 +15,15 @@ use std::io::{stdin, stdout, Write};
 use std::iter::FromIterator;
 use std::str::FromStr;
 use std::*;
-// use superslice::Ext;
+// use superslice::*;
 // use rand::Rng;
 // use rand::rngs::SmallRng;
 // use rand::seq::SliceRandom;
-
-const INF32: i32 = 2147483647;
-const UINF32: u32 = 4294967295;
-const IINF32: i32 = -2147483648;
-const INF64: i64 = 9223372036854775807;
-const UINF64: usize = 18446744073709551615;
-const IINF64: i64 = -9223372036854775808;
-const INF128: i128 = 170141183460469231731687303715884105727;
-const IINF128: i128 = -170141183460469231731687303715884105728;
 const MOD1000000007: i64 = 1000000007;
 const MOD998244353: i64 = 998244353;
 const MOD: i64 = 998244353;
 const UMOD: usize = MOD as usize;
 const PI: f64 = 3.14159265358979323846;
-
 macro_rules! p {
     ($($arg:expr),*) => {
         #[allow(unused_assignments)]
@@ -52,7 +40,6 @@ macro_rules! p {
         }
     };
 }
-
 macro_rules! vp {
     ($x:expr) => {
         print!(
@@ -64,13 +51,22 @@ macro_rules! vp {
         );
     };
 }
-
 macro_rules! dprint {
-    ($x:expr) => {
-        eprint!("{:?}\n", $x);
+    ($($arg:expr),*) => {
+        #[allow(unused_assignments)]
+        {
+            let mut first = true;
+            $(
+                if !first {
+                    eprint!(" ");
+                }
+                eprint!("{:?}", $arg);
+                first = false;
+            )*
+            eprint!("\n");
+        }
     };
 }
-
 macro_rules! yesno {
     ($val:expr) => {
         if $val {
@@ -80,29 +76,24 @@ macro_rules! yesno {
         }
     };
 }
-
 fn read<T: FromStr>() -> T {
     let mut s = String::new();
     std::io::stdin().read_line(&mut s).ok();
     s.trim().parse().ok().unwrap()
 }
-
 fn read_vec<T: FromStr>() -> Vec<T> {
     read::<String>()
         .split_whitespace()
         .map(|e| e.parse().ok().unwrap())
         .collect()
 }
-
 fn read_mat<T: FromStr>(n: u32) -> Vec<Vec<T>> {
     (0..n).map(|_| read_vec()).collect()
 }
-
 fn readii() -> (i64, i64) {
     let vec: Vec<i64> = read_vec();
     (vec[0], vec[1])
 }
-
 fn readiii() -> (i64, i64, i64) {
     let vec: Vec<i64> = read_vec();
     (vec[0], vec[1], vec[2])
@@ -111,17 +102,14 @@ fn readuu() -> (usize, usize) {
     let vec: Vec<usize> = read_vec();
     (vec[0], vec[1])
 }
-
 fn readff() -> (f64, f64) {
     let vec: Vec<f64> = read_vec();
     (vec[0], vec[1])
 }
-
 fn readcc() -> (char, char) {
     let vec: Vec<char> = read_vec();
     (vec[0], vec[1])
 }
-
 fn readuuu() -> (usize, usize, usize) {
     let vec: Vec<usize> = read_vec();
     (vec[0], vec[1], vec[2])
@@ -130,12 +118,10 @@ fn readiiii() -> (i64, i64, i64, i64) {
     let vec: Vec<i64> = read_vec();
     (vec[0], vec[1], vec[2], vec[3])
 }
-
 fn readuuuu() -> (usize, usize, usize, usize) {
     let vec: Vec<usize> = read_vec();
     (vec[0], vec[1], vec[2], vec[3])
 }
-
 // https://qiita.com/tanakh/items/0ba42c7ca36cd29d0ac8
 macro_rules! input {
     (source = $s:expr, $($r:tt)*) => {
@@ -157,39 +143,31 @@ macro_rules! input {
         input_inner!{next, $($r)*}
     };
 }
-
 macro_rules! input_inner {
     ($next:expr) => {};
     ($next:expr, ) => {};
-
     ($next:expr, $var:ident : $t:tt $($r:tt)*) => {
         let $var = read_value!($next, $t);
         input_inner!{$next $($r)*}
     };
 }
-
 macro_rules! read_value {
     ($next:expr, ( $($t:tt),* )) => {
         ( $(read_value!($next, $t)),* )
     };
-
     ($next:expr, [ $t:tt ; $len:expr ]) => {
         (0..$len).map(|_| read_value!($next, $t)).collect::<Vec<_>>()
     };
-
     ($next:expr, chars) => {
         read_value!($next, String).chars().collect::<Vec<char>>()
     };
-
     ($next:expr, usize1) => {
         read_value!($next, usize) - 1
     };
-
     ($next:expr, $t:ty) => {
         $next().parse::<$t>().expect("Parse error")
     };
 }
-
 fn main() {
     input! {
      n: usize,
