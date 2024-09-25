@@ -1,5 +1,6 @@
 // -*- coding:utf-8-unix -*-
 #![allow(dead_code, unused_imports, unused_macros)]
+use ::num;
 // use ac_library::*;
 // use proconio::input;
 use cmp::Ordering::*;
@@ -23,20 +24,11 @@ const MOD1000000007: i64 = 1000000007;
 const MOD998244353: i64 = 998244353;
 const MOD: i64 = 998244353;
 const UMOD: usize = MOD as usize;
-const PI: f64 = 3.14159265358979323846;
+const PI: f64 = f64::consts::PI;
 macro_rules! p {
     ($($arg:expr),*) => {
-        #[allow(unused_assignments)]
         {
-            let mut first = true;
-            $(
-                if !first {
-                    print!(" ");
-                }
-                print!("{}", $arg);
-                first = false;
-            )*
-            print!("\n");
+            print!("{}\n", vec![$(format!("{}", $arg)),*].join(" "));
         }
     };
 }
