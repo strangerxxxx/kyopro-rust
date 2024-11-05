@@ -41,8 +41,6 @@ macro_rules! p {
     ($($arg:expr),*) => {
         {
             print!("{}\n", vec![$(format!("{}", $arg)),*].join(" "));
-        {
-            print!("{}\n", vec![$(format!("{}", $arg)),*].join(" "));
         }
     };
 }
@@ -61,30 +59,8 @@ macro_rules! vp {
 #[macro_export]
 macro_rules! dprint {
     ($($arg:expr),*) => {
-        #[allow(unused_assignments)]
         {
-            let mut first = true;
-            $(
-                if !first {
-                    eprint!(" ");
-                }
-                eprint!("{:?}", $arg);
-                first = false;
-            )*
-            eprint!("\n");
-        }
-    ($($arg:expr),*) => {
-        #[allow(unused_assignments)]
-        {
-            let mut first = true;
-            $(
-                if !first {
-                    eprint!(" ");
-                }
-                eprint!("{:?}", $arg);
-                first = false;
-            )*
-            eprint!("\n");
+            eprint!("{}\n", vec![$(format!("{:?}", $arg)),*].join(" "));
         }
     };
 }
