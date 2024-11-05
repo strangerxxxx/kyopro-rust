@@ -2,31 +2,10 @@
 #![allow(dead_code, unused_imports, unused_macros)]
 fn main() {
     input! {
-        n: usize,
-        t: usize,
-        a: [usize1; t],
+     n: usize,
+     m: usize,
+     a: [usize; n],
     }
-    let mut r = vec![0; n];
-    let mut c = vec![0; n];
-    let mut s1 = 0;
-    let mut s2 = 0;
-    for (turn, ai) in a.into_iter().enumerate() {
-        let d = ai / n;
-        let m = ai % n;
-        r[d] += 1;
-        c[m] += 1;
-        if d == m {
-            s1 += 1;
-        }
-        if n - d - 1 == m {
-            s2 += 1;
-        }
-        if r[d] == n || c[m] == n || s1 == n || s2 == n {
-            p!(turn + 1);
-            return;
-        }
-    }
-    p!(-1);
 }
 // use ::num;
 // use itertools::Itertools;
@@ -46,6 +25,7 @@ use std::iter::FromIterator;
 use std::str::FromStr;
 use std::*;
 // use superslice::*;
+// use superslice::*;
 // use rand::Rng;
 // use rand::rngs::SmallRng;
 // use rand::seq::SliceRandom;
@@ -59,6 +39,8 @@ const DIJ: [(usize, usize); 4] = [(!0, 0), (1, 0), (0, !0), (0, 1)];
 #[macro_export]
 macro_rules! p {
     ($($arg:expr),*) => {
+        {
+            print!("{}\n", vec![$(format!("{}", $arg)),*].join(" "));
         {
             print!("{}\n", vec![$(format!("{}", $arg)),*].join(" "));
         }
@@ -78,6 +60,19 @@ macro_rules! vp {
 }
 #[macro_export]
 macro_rules! dprint {
+    ($($arg:expr),*) => {
+        #[allow(unused_assignments)]
+        {
+            let mut first = true;
+            $(
+                if !first {
+                    eprint!(" ");
+                }
+                eprint!("{:?}", $arg);
+                first = false;
+            )*
+            eprint!("\n");
+        }
     ($($arg:expr),*) => {
         #[allow(unused_assignments)]
         {
