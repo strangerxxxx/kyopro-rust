@@ -1,8 +1,36 @@
 // -*- coding:utf-8-unix -*-
-// #![feature(map_first_last)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
-#![allow(unused_macros)]
+#![allow(dead_code, unused_imports, unused_macros)]
+fn main() {
+    input! {
+        n: usize,
+        t: usize,
+        a: [usize1; t],
+    }
+    let mut r = vec![0; n];
+    let mut c = vec![0; n];
+    let mut s1 = 0;
+    let mut s2 = 0;
+    for (turn, ai) in a.into_iter().enumerate() {
+        let d = ai / n;
+        let m = ai % n;
+        r[d] += 1;
+        c[m] += 1;
+        if d == m {
+            s1 += 1;
+        }
+        if n - d - 1 == m {
+            s2 += 1;
+        }
+        if r[d] == n || c[m] == n || s1 == n || s2 == n {
+            p!(turn + 1);
+            return;
+        }
+    }
+    p!(-1);
+}
+// use ::num;
+// use itertools::Itertools;
+// use ac_library::*;
 // use proconio::input;
 use cmp::Ordering::*;
 // use itertools::Itertools;
@@ -17,42 +45,26 @@ use std::io::{stdin, stdout, Write};
 use std::iter::FromIterator;
 use std::str::FromStr;
 use std::*;
-// use superslice::Ext;
+// use superslice::*;
 // use rand::Rng;
 // use rand::rngs::SmallRng;
 // use rand::seq::SliceRandom;
-
-const INF32: i32 = 2147483647;
-const UINF32: u32 = 4294967295;
-const IINF32: i32 = -2147483648;
-const INF64: i64 = 9223372036854775807;
-const UINF64: usize = 18446744073709551615;
-const IINF64: i64 = -9223372036854775808;
-const INF128: i128 = 170141183460469231731687303715884105727;
-const IINF128: i128 = -170141183460469231731687303715884105728;
 const MOD1000000007: i64 = 1000000007;
 const MOD998244353: i64 = 998244353;
 const MOD: i64 = 998244353;
 const UMOD: usize = MOD as usize;
-const PI: f64 = 3.14159265358979323846;
-
+const PI: f64 = f64::consts::PI;
+const DIRS: [char; 4] = ['U', 'D', 'L', 'R'];
+const DIJ: [(usize, usize); 4] = [(!0, 0), (1, 0), (0, !0), (0, 1)];
+#[macro_export]
 macro_rules! p {
     ($($arg:expr),*) => {
-        #[allow(unused_assignments)]
         {
-            let mut first = true;
-            $(
-                if !first {
-                    print!(" ");
-                }
-                print!("{}", $arg);
-                first = false;
-            )*
-            print!("\n");
+            print!("{}\n", vec![$(format!("{}", $arg)),*].join(" "));
         }
     };
 }
-
+#[macro_export]
 macro_rules! vp {
     ($x:expr) => {
         print!(
@@ -64,13 +76,24 @@ macro_rules! vp {
         );
     };
 }
-
+#[macro_export]
 macro_rules! dprint {
-    ($x:expr) => {
-        eprint!("{:?}\n", $x);
+    ($($arg:expr),*) => {
+        #[allow(unused_assignments)]
+        {
+            let mut first = true;
+            $(
+                if !first {
+                    eprint!(" ");
+                }
+                eprint!("{:?}", $arg);
+                first = false;
+            )*
+            eprint!("\n");
+        }
     };
 }
-
+#[macro_export]
 macro_rules! yesno {
     ($val:expr) => {
         if $val {
@@ -80,29 +103,24 @@ macro_rules! yesno {
         }
     };
 }
-
 fn read<T: FromStr>() -> T {
     let mut s = String::new();
     std::io::stdin().read_line(&mut s).ok();
     s.trim().parse().ok().unwrap()
 }
-
 fn read_vec<T: FromStr>() -> Vec<T> {
     read::<String>()
         .split_whitespace()
         .map(|e| e.parse().ok().unwrap())
         .collect()
 }
-
-fn read_mat<T: FromStr>(n: u32) -> Vec<Vec<T>> {
+fn read_mat<T: FromStr>(n: usize) -> Vec<Vec<T>> {
     (0..n).map(|_| read_vec()).collect()
 }
-
 fn readii() -> (i64, i64) {
     let vec: Vec<i64> = read_vec();
     (vec[0], vec[1])
 }
-
 fn readiii() -> (i64, i64, i64) {
     let vec: Vec<i64> = read_vec();
     (vec[0], vec[1], vec[2])
@@ -111,17 +129,14 @@ fn readuu() -> (usize, usize) {
     let vec: Vec<usize> = read_vec();
     (vec[0], vec[1])
 }
-
 fn readff() -> (f64, f64) {
     let vec: Vec<f64> = read_vec();
     (vec[0], vec[1])
 }
-
 fn readcc() -> (char, char) {
     let vec: Vec<char> = read_vec();
     (vec[0], vec[1])
 }
-
 fn readuuu() -> (usize, usize, usize) {
     let vec: Vec<usize> = read_vec();
     (vec[0], vec[1], vec[2])
@@ -130,13 +145,11 @@ fn readiiii() -> (i64, i64, i64, i64) {
     let vec: Vec<i64> = read_vec();
     (vec[0], vec[1], vec[2], vec[3])
 }
-
 fn readuuuu() -> (usize, usize, usize, usize) {
     let vec: Vec<usize> = read_vec();
     (vec[0], vec[1], vec[2], vec[3])
 }
-
-// https://qiita.com/tanakh/items/0ba42c7ca36cd29d0ac8
+#[macro_export]
 macro_rules! input {
     (source = $s:expr, $($r:tt)*) => {
         let mut iter = $s.split_whitespace();
@@ -157,43 +170,106 @@ macro_rules! input {
         input_inner!{next, $($r)*}
     };
 }
-
+#[macro_export]
 macro_rules! input_inner {
     ($next:expr) => {};
     ($next:expr, ) => {};
-
+    ($next:expr, mut $var:ident : $t:tt $($r:tt)*) => {
+        let mut $var = read_value!($next, $t);
+        input_inner!{$next $($r)*}
+    };
     ($next:expr, $var:ident : $t:tt $($r:tt)*) => {
         let $var = read_value!($next, $t);
         input_inner!{$next $($r)*}
     };
 }
-
+#[macro_export]
 macro_rules! read_value {
     ($next:expr, ( $($t:tt),* )) => {
         ( $(read_value!($next, $t)),* )
     };
-
     ($next:expr, [ $t:tt ; $len:expr ]) => {
         (0..$len).map(|_| read_value!($next, $t)).collect::<Vec<_>>()
     };
-
     ($next:expr, chars) => {
         read_value!($next, String).chars().collect::<Vec<char>>()
     };
-
     ($next:expr, usize1) => {
         read_value!($next, usize) - 1
     };
-
     ($next:expr, $t:ty) => {
         $next().parse::<$t>().expect("Parse error")
     };
 }
-
-fn main() {
-    input! {
-     n: usize,
-     k: usize,
-     a: [usize; n],
+fn chmin<T: PartialOrd + Copy>(a: &mut T, b: T) {
+    if *a > b {
+        *a = b;
     }
+}
+fn chmax<T: PartialOrd + Copy>(a: &mut T, b: T) {
+    if *a < b {
+        *a = b;
+    }
+}
+pub trait BinarySearch<T> {
+    fn bisect_left(&self, key: T) -> usize;
+    fn bisect_right(&self, key: T) -> usize;
+}
+impl<T> BinarySearch<T> for [T]
+where
+    T: Ord,
+{
+    fn bisect_left(&self, key: T) -> usize {
+        let mut ng = -1 as isize;
+        let mut ok = self.len() as isize;
+        while ok - ng > 1 {
+            let mid = (ok + ng) / 2;
+            if key <= self[mid as usize] {
+                ok = mid;
+            } else {
+                ng = mid;
+            }
+        }
+        ok as usize
+    }
+
+    fn bisect_right(&self, key: T) -> usize {
+        let mut ng = -1 as isize;
+        let mut ok = self.len() as isize;
+        while ok - ng > 1 {
+            let mid = (ok + ng) / 2;
+            if key < self[mid as usize] {
+                ok = mid;
+            } else {
+                ng = mid;
+            }
+        }
+        ok as usize
+    }
+}
+fn mod_pow<T>(x: T, a: T, md: T) -> T
+where
+    T: Copy
+        + From<u8>
+        + std::ops::Mul<Output = T>
+        + std::ops::Rem<Output = T>
+        + std::ops::Shr<u64, Output = T>
+        + std::ops::Add<Output = T>
+        + std::ops::BitAnd<Output = T>
+        + PartialOrd
+        + Default
+        + std::ops::ShrAssign<i32>,
+{
+    let mut res = T::from(1);
+    let mut base = x;
+    let mut ai = a;
+
+    while ai > T::from(0) {
+        if ai & T::from(1) == T::from(1) {
+            res = res * base % md;
+        }
+        ai >>= 1;
+        base = (base * base) % md;
+    }
+    res
 }
