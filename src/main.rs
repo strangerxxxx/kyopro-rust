@@ -2,9 +2,9 @@
 #![allow(dead_code, unused_imports, unused_macros)]
 fn main() {
     input! {
-     n: usize,
-     m: usize,
-     a: [usize; n],
+        n: usize,
+        m: usize,
+        a: [usize; n],
     }
 }
 // use ::num;
