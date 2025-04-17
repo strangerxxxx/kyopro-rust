@@ -70,9 +70,9 @@ macro_rules! dprint {
 macro_rules! yesno {
     ($val:expr) => {
         if $val {
-            out.write(b"Yes\n").unwrap();
+            print!("Yes\n");
         } else {
-            out.write(b"No\n").unwrap();
+            print!("No\n");
         }
     };
 }
