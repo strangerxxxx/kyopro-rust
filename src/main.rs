@@ -140,7 +140,7 @@ macro_rules! read_value {
         ( $(read_value!($next, $t)),* )
     };
     ($next:expr, [ $t:tt ; all ]) => { {
-            let mut str = $next(false);
+            let str = $next(false);
             str.split_whitespace().map(|it| it.parse::<$t>().unwrap()).collect::<Vec<_>>()
         }
     };
