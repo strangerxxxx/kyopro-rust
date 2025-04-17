@@ -9,6 +9,7 @@ fn main() {
 }
 // use ::num;
 // use ac_library::*;
+// use ac_library::ModInt998244353 as Mint;
 use cmp::Ordering::*;
 // use fixedbitset::FixedBitSet;
 // use itertools::Itertools;
@@ -69,9 +70,9 @@ macro_rules! dprint {
 macro_rules! yesno {
     ($val:expr) => {
         if $val {
-            print!("Yes\n");
+            out.write(b"Yes\n").unwrap();
         } else {
-            print!("No\n");
+            out.write(b"No\n").unwrap();
         }
     };
 }
@@ -86,41 +87,6 @@ fn read_vec<T: FromStr>() -> Vec<T> {
         .map(|e| e.parse().ok().unwrap())
         .collect()
 }
-fn read_mat<T: FromStr>(n: usize) -> Vec<Vec<T>> {
-    (0..n).map(|_| read_vec()).collect()
-}
-fn readii() -> (i64, i64) {
-    let vec: Vec<i64> = read_vec();
-    (vec[0], vec[1])
-}
-fn readiii() -> (i64, i64, i64) {
-    let vec: Vec<i64> = read_vec();
-    (vec[0], vec[1], vec[2])
-}
-fn readuu() -> (usize, usize) {
-    let vec: Vec<usize> = read_vec();
-    (vec[0], vec[1])
-}
-fn readff() -> (f64, f64) {
-    let vec: Vec<f64> = read_vec();
-    (vec[0], vec[1])
-}
-fn readcc() -> (char, char) {
-    let vec: Vec<char> = read_vec();
-    (vec[0], vec[1])
-}
-fn readuuu() -> (usize, usize, usize) {
-    let vec: Vec<usize> = read_vec();
-    (vec[0], vec[1], vec[2])
-}
-fn readiiii() -> (i64, i64, i64, i64) {
-    let vec: Vec<i64> = read_vec();
-    (vec[0], vec[1], vec[2], vec[3])
-}
-fn readuuuu() -> (usize, usize, usize, usize) {
-    let vec: Vec<usize> = read_vec();
-    (vec[0], vec[1], vec[2], vec[3])
-}
 #[macro_export]
 macro_rules! input {
     (source = $s:expr, $($r:tt)*) => {
@@ -131,13 +97,22 @@ macro_rules! input {
     ($($r:tt)*) => {
         let stdin = std::io::stdin();
         let mut bytes = std::io::Read::bytes(std::io::BufReader::new(stdin.lock()));
-        let mut next = move || -> String{
-            bytes
-                .by_ref()
-                .map(|r|r.unwrap() as char)
-                .skip_while(|c|c.is_whitespace())
-                .take_while(|c|!c.is_whitespace())
-                .collect()
+        let mut next = move |is_word: bool| -> String{
+            if is_word {
+                bytes
+                    .by_ref()
+                    .map(|r|r.unwrap() as char)
+                    .skip_while(|c|c.is_whitespace())
+                    .take_while(|c|!c.is_whitespace())
+                    .collect()
+            } else {
+                bytes
+                    .by_ref()
+                    .map(|r|r.unwrap() as char)
+                    .skip_while(|c| c == &'\n')
+                    .take_while(|c| c != &'\n')
+                    .collect()
+            }
         };
         input_inner!{next, $($r)*}
     };
@@ -146,6 +121,10 @@ macro_rules! input {
 macro_rules! input_inner {
     ($next:expr) => {};
     ($next:expr, ) => {};
+    ($next:expr, static $var:ident : $t:tt $($rest:tt)*) => {
+        $var = read_value!($next, $t);
+        input_inner!{$next $($rest)*}
+    };
     ($next:expr, mut $var:ident : $t:tt $($r:tt)*) => {
         let mut $var = read_value!($next, $t);
         input_inner!{$next $($r)*}
@@ -160,17 +139,44 @@ macro_rules! read_value {
     ($next:expr, ( $($t:tt),* )) => {
         ( $(read_value!($next, $t)),* )
     };
+    ($next:expr, [ $t:tt ; all ]) => { {
+            let mut str = $next(false);
+            str.split_whitespace().map(|it| it.parse::<$t>().unwrap()).collect::<Vec<_>>()
+        }
+    };
+    ($next:expr, [ @vec $t:tt ; $len:expr ]) => {{
+        (0..$len).map(|_| {
+            let line = $next(false);
+            line.split_whitespace()
+                .map(|token| token.parse::<$t>().expect("parse error"))
+                .collect::<Vec<_>>()
+        }).collect::<Vec<_>>()
+    }};
     ($next:expr, [ $t:tt ; $len:expr ]) => {
-        (0..$len).map(|_| read_value!($next, $t)).collect::<Vec<_>>()
+        (0..$len as usize).map(|_| read_value!($next, $t)).collect::<Vec<_>>()
     };
     ($next:expr, chars) => {
         read_value!($next, String).chars().collect::<Vec<char>>()
+    };
+    ($next:expr, lines) => {
+        {
+            let mut vec = Vec::new();
+            let mut str = $next(false);
+            while str != "" {
+                vec.push(str);
+                str = $next(false);
+            }
+            vec
+       }
+    };
+    ($next:expr, line) => {
+        $next(false)
     };
     ($next:expr, usize1) => {
         read_value!($next, usize) - 1
     };
     ($next:expr, $t:ty) => {
-        $next().parse::<$t>().expect("Parse error")
+        $next(true).parse::<$t>().expect("Parse error")
     };
 }
 fn chmin<T: PartialOrd + Copy>(a: &mut T, b: T) {
