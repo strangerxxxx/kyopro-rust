@@ -76,6 +76,18 @@ macro_rules! yesno {
         }
     };
 }
+#[macro_export]
+macro_rules! yes {
+    () => {
+        print!("Yes\n");
+    };
+}
+#[macro_export]
+macro_rules! no {
+    () => {
+        print!("No\n");
+    };
+}
 fn read<T: FromStr>() -> T {
     let mut s = String::new();
     std::io::stdin().read_line(&mut s).ok();
