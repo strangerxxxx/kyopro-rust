@@ -170,6 +170,9 @@ macro_rules! read_value {
     ($next:expr, chars) => {
         read_value!($next, String).chars().collect::<Vec<char>>()
     };
+    ($next:expr, bytes) => {
+        read_value!($next, String).into_bytes()
+    };
     ($next:expr, lines) => {
         {
             let mut vec = Vec::new();
