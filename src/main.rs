@@ -191,14 +191,20 @@ macro_rules! read_value {
         $next(true).parse::<$t>().expect("Parse error")
     };
 }
-fn chmin<T: PartialOrd + Copy>(a: &mut T, b: T) {
+fn chmin<T: PartialOrd + Copy>(a: &mut T, b: T) -> bool {
     if *a > b {
         *a = b;
+        true
+    } else {
+        false
     }
 }
-fn chmax<T: PartialOrd + Copy>(a: &mut T, b: T) {
+fn chmax<T: PartialOrd + Copy>(a: &mut T, b: T) -> bool {
     if *a < b {
         *a = b;
+        true
+    } else {
+        false
     }
 }
 pub trait BinarySearch<T> {
