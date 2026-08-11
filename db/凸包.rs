@@ -7,6 +7,9 @@ fn convex_hull(mut ps: Vec<(usize, usize)>, ps_is_sorted: bool) -> Vec<(usize, u
     if !ps_is_sorted {
         ps.sort_by(|a, b| a.partial_cmp(b).unwrap());
     }
+    if ps.len() <= 1 {
+        return ps;
+    }
 
     let mut res = Vec::new();
 
@@ -27,5 +30,7 @@ fn convex_hull(mut ps: Vec<(usize, usize)>, ps_is_sorted: bool) -> Vec<(usize, u
         res.push(p);
     }
 
+    // 始点が末尾に重複するので除去
+    res.pop();
     res
 }

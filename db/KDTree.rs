@@ -66,6 +66,11 @@ impl KDTree {
         }
     }
 
+    fn in_range(p: Point, x1: i64, x2: i64, y1: i64, y2: i64) -> bool {
+        let (x, y) = p;
+        x1 <= x && x <= x2 && y1 <= y && y <= y2
+    }
+
     fn count(&self, x1: i64, x2: i64, y1: i64, y2: i64) -> usize {
         if x2 < self.xmin || self.xmax < x1 || y2 < self.ymin || self.ymax < y1 {
             return 0;
@@ -74,18 +79,30 @@ impl KDTree {
             return self.size;
         }
         if self.l.is_none() && self.r.is_none() {
-            return self.size;
+            return self
+                .data
+                .iter()
+                .filter(|&&p| Self::in_range(p, x1, x2, y1, y2))
+                .count();
         }
         self.l.as_ref().map_or(0, |l| l.count(x1, x2, y1, y2))
             + self.r.as_ref().map_or(0, |r| r.count(x1, x2, y1, y2))
     }
 
-    fn sum(&self, x1: i32, x2: i32, y1: i32, y2: i32) -> usize {
+    fn sum(&self, x1: i64, x2: i64, y1: i64, y2: i64) -> usize {
+        // weight は点数なので、現状は count と同値
         if x2 < self.xmin || self.xmax < x1 || y2 < self.ymin || self.ymax < y1 {
             return 0;
         }
         if x1 <= self.xmin && self.xmax <= x2 && y1 <= self.ymin && self.ymax <= y2 {
             return self.weight;
+        }
+        if self.l.is_none() && self.r.is_none() {
+            return self
+                .data
+                .iter()
+                .filter(|&&p| Self::in_range(p, x1, x2, y1, y2))
+                .count();
         }
         self.l.as_ref().map_or(0, |l| l.sum(x1, x2, y1, y2))
             + self.r.as_ref().map_or(0, |r| r.sum(x1, x2, y1, y2))
@@ -99,11 +116,12 @@ impl KDTree {
             return self.collect_all_points();
         }
         if self.l.is_none() && self.r.is_none() {
-            return self.data.clone();
-            // .iter()
-            // .cloned()
-            // .filter(|&(x, y)| x1 <= x && x <= x2 && y1 <= y && y <= y2)
-            // .collect();
+            return self
+                .data
+                .iter()
+                .copied()
+                .filter(|&p| Self::in_range(p, x1, x2, y1, y2))
+                .collect();
         }
         let mut res = vec![];
         if let Some(l) = &self.l {

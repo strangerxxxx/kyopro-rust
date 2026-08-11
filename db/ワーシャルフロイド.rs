@@ -4,7 +4,7 @@ fn main() {
         d[i][i] = 0;
     }
     for (s, t, di) in edges {
-        d[s][t] = di;
+        chmin(&mut d[s][t], di);
     }
     for k in 0..n {
         for i in 0..n {

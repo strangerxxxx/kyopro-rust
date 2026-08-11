@@ -28,12 +28,21 @@ pub fn faster_eratosthenes(n: usize) -> Vec<usize> {
     let inv_shift: HashMap<u8, usize> = shift.iter().enumerate().map(|(i, &s)| (s, i)).collect();
 
     let mut res = vec![2, 3, 5];
-    let max_k = n / 30;
 
+    // n % 30 == 0 のとき take_while(...).count() == 0 となり -1 で underflow するため分岐
+    let wheel_bound = |x: usize| -> (usize, usize) {
+        let rem = x % 30;
+        if rem == 0 {
+            (x / 30 - 1, 7)
+        } else {
+            let max_m = remains.iter().take_while(|&&r| r <= rem).count() - 1;
+            (x / 30, max_m)
+        }
+    };
+
+    let (max_k, max_m) = wheel_bound(n);
     let sqrtn = (n as f64).sqrt().ceil() as usize;
-    let max_m = remains.iter().take_while(|&&r| r <= n % 30).count() - 1;
-    let max_sqrt_k = sqrtn / 30;
-    let max_sqrt_m = remains.iter().take_while(|&&r| r <= sqrtn % 30).count() - 1;
+    let (max_sqrt_k, max_sqrt_m) = wheel_bound(sqrtn);
 
     let mut table = vec![msk; max_k + 1];
     table[max_k] = (1 << (max_m + 1)) - 1;

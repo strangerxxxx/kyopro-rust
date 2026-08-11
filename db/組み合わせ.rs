@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn pow_mod(mut x: i64, mut n: i64, mod_: i64) -> i64 {
     let mut res = 1;
     while n > 0 {
@@ -11,7 +13,7 @@ fn pow_mod(mut x: i64, mut n: i64, mod_: i64) -> i64 {
 }
 
 fn cmb(n: i64, r: i64, mod_: i64) -> i64 {
-    if n < 0 || n < r {
+    if n < 0 || r < 0 || n < r {
         return 0;
     }
     if r > n - r {
@@ -30,7 +32,7 @@ fn perm(mut n: i64, mut r: i64, mod_: i64) -> i64 {
     if r == -1 {
         r = n;
     }
-    if n < 0 || n < r {
+    if n < 0 || r < 0 || n < r {
         return 0;
     }
     let mut res = 1;
@@ -42,6 +44,12 @@ fn perm(mut n: i64, mut r: i64, mod_: i64) -> i64 {
 }
 
 fn hom(n: i64, r: i64, mod_: i64) -> i64 {
+    if n == 0 {
+        return if r == 0 { 1 } else { 0 };
+    }
+    if r < 0 {
+        return 0;
+    }
     cmb(n + r - 1, r, mod_)
 }
 
@@ -86,17 +94,17 @@ impl Combination {
     }
 
     fn calc(&self, n: i64, r: i64) -> i64 {
-        if n < 0 || n < r {
+        if n < 0 || r < 0 || n < r {
             return 0;
         }
-        assert!(r <= self.n_max);
+        assert!(n <= self.n_max);
         self.fac[n as usize] * self.facinv[r as usize] % self.mod_ * self.facinv[(n - r) as usize]
             % self.mod_
     }
 }
 
 struct MemorizeCombination {
-    cmb: HashMap<(i64, i64), i64>,
+    cmb: HashMap<(i64, i64, i64), i64>,
 }
 
 impl MemorizeCombination {
@@ -114,11 +122,11 @@ impl MemorizeCombination {
         if r == 0 {
             return 1;
         }
-        if let Some(&res) = self.cmb.get(&(n, r)) {
+        if let Some(&res) = self.cmb.get(&(n, r, m)) {
             return res;
         }
         let res = (self.call(n - 1, r - 1, m) + self.call(n - 1, r, m)) % m;
-        self.cmb.insert((n, r), res);
+        self.cmb.insert((n, r, m), res);
         res
     }
 
