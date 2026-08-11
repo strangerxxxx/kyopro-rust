@@ -4,3 +4,6 @@ target
 **/*.rs.bk
 *.pdb
 /.vscode
+input.txt
+output.txt
+*.lnk

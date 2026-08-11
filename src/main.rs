@@ -1,280 +1,144 @@
 // -*- coding:utf-8-unix -*-
-#![allow(dead_code, unused_imports, unused_macros)]
-fn main() {
-    input! {
-        n: usize,
-        m: usize,
-        a: [usize; n],
-    }
-}
-// use ::num;
-// use ac_library::*;
-// use ac_library::ModInt998244353 as Mint;
-use cmp::Ordering::*;
-// use fixedbitset::FixedBitSet;
-// use itertools::Itertools;
-// use itertools_num::ItertoolsNum;
-// use maplit;
-// use omniswap::swap;
-// use ordered_float::OrderedFloat;
-// use proconio::input as pinput;
-// use proconio::marker::{Bytes, Chars, Isize1, Usize1};
-// use rand::prelude::*;
-// use rand::rngs::SmallRng;
-// use rand::seq::SliceRandom;
-// use rand::Rng;
-// use rand::SeedableRng;
-// use rand_chacha::ChaCha20Rng;
-// use rand_distr::Normal;
+#![allow(dead_code)]
+#![allow(unused_imports)]
+#![allow(unused_macros)]
+
 use std::cmp::*;
 use std::collections::*;
-use std::fmt::*;
-use std::hash::*;
-use std::io::{stdin, stdout, Write};
-use std::iter::FromIterator;
-use std::mem::swap;
-use std::str::FromStr;
-use std::time::{Duration, Instant};
-use std::*;
-// use superslice::*;
-const MOD1000000007: i64 = 1000000007;
-const MOD998244353: i64 = 998244353;
-const MOD: i64 = 998244353;
-const UMOD: usize = MOD as usize;
-const PI: f64 = f64::consts::PI;
-const DIRS: [char; 4] = ['U', 'D', 'L', 'R'];
-const DIJ: [(usize, usize); 4] = [(!0, 0), (1, 0), (0, !0), (0, 1)];
-#[macro_export]
-macro_rules! p {
-    ($($arg:expr),*) => {
-        {
-            print!("{}\n", vec![$(format!("{}", $arg)),*].join(" "));
-        }
-    };
-}
-#[macro_export]
-macro_rules! vp {
-    ($x:expr) => {
-        print!(
-            "{}\n",
-            $x.iter()
-                .map(|x| x.to_string())
-                .collect::<Vec<_>>()
-                .join(" ")
-        );
-    };
-}
-#[macro_export]
-macro_rules! dprint {
-    ($($arg:expr),*) => {
-        {
-            eprint!("{}\n", vec![$(format!("{:?}", $arg)),*].join(" "));
-        }
-    };
-}
-#[macro_export]
-macro_rules! yesno {
-    ($val:expr) => {
-        if $val {
-            print!("Yes\n");
-        } else {
-            print!("No\n");
-        }
-    };
-}
-#[macro_export]
-macro_rules! yes {
-    () => {
-        print!("Yes\n");
-    };
-}
-#[macro_export]
-macro_rules! no {
-    () => {
-        print!("No\n");
-    };
-}
-fn read<T: FromStr>() -> T {
-    let mut s = String::new();
-    std::io::stdin().read_line(&mut s).ok();
-    s.trim().parse().ok().unwrap()
-}
-fn read_vec<T: FromStr>() -> Vec<T> {
-    read::<String>()
-        .split_whitespace()
-        .map(|e| e.parse().ok().unwrap())
-        .collect()
-}
-#[macro_export]
+
+// ---------------------------------------------------------------------------
+// I/O: proconio があればそれを使い、なければ同 API のフォールバック input! を使う
+// - AtCoder ジャッジ: --cfg atcoder → proconio（ジャッジ側 Cargo.toml に依存あり）
+// - ローカル既定: feature use-proconio → proconio
+// - proconio なし: cargo build --no-default-features  /  単体 rustc
+// ---------------------------------------------------------------------------
+#[cfg(any(atcoder, feature = "use-proconio"))]
+use proconio::input;
+
+// proconio 非利用時のフォールバック（tanakh input! 互換）
+// https://qiita.com/tanakh/items/0ba42c7ca36cd29d0ac8
+#[cfg(not(any(atcoder, feature = "use-proconio")))]
 macro_rules! input {
     (source = $s:expr, $($r:tt)*) => {
         let mut iter = $s.split_whitespace();
-        let mut next = || { iter.next().unwrap() };
-        input_inner!{next, $($r)*}
+        let mut next = || iter.next().expect("input token missing");
+        input_inner! { next, $($r)* }
     };
     ($($r:tt)*) => {
         let stdin = std::io::stdin();
         let mut bytes = std::io::Read::bytes(std::io::BufReader::new(stdin.lock()));
-        let mut next = move |is_word: bool| -> String{
-            if is_word {
-                bytes
-                    .by_ref()
-                    .map(|r|r.unwrap() as char)
-                    .skip_while(|c|c.is_whitespace())
-                    .take_while(|c|!c.is_whitespace())
-                    .collect()
-            } else {
-                bytes
-                    .by_ref()
-                    .map(|r|r.unwrap() as char)
-                    .skip_while(|c| c == &'\n')
-                    .take_while(|c| c != &'\n')
-                    .collect()
-            }
+        let mut next = move || -> String {
+            bytes
+                .by_ref()
+                .map(|r| r.expect("stdin read error") as char)
+                .skip_while(|c| c.is_whitespace())
+                .take_while(|c| !c.is_whitespace())
+                .collect()
         };
-        input_inner!{next, $($r)*}
+        input_inner! { next, $($r)* }
     };
 }
-#[macro_export]
+
+#[cfg(not(any(atcoder, feature = "use-proconio")))]
 macro_rules! input_inner {
     ($next:expr) => {};
     ($next:expr, ) => {};
-    ($next:expr, static $var:ident : $t:tt $($rest:tt)*) => {
-        $var = read_value!($next, $t);
-        input_inner!{$next $($rest)*}
-    };
-    ($next:expr, mut $var:ident : $t:tt $($r:tt)*) => {
-        let mut $var = read_value!($next, $t);
-        input_inner!{$next $($r)*}
-    };
     ($next:expr, $var:ident : $t:tt $($r:tt)*) => {
         let $var = read_value!($next, $t);
-        input_inner!{$next $($r)*}
+        input_inner! { $next $($r)* }
     };
 }
-#[macro_export]
+
+#[cfg(not(any(atcoder, feature = "use-proconio")))]
 macro_rules! read_value {
     ($next:expr, ( $($t:tt),* )) => {
         ( $(read_value!($next, $t)),* )
     };
-    ($next:expr, [ $t:tt ; all ]) => { {
-            let str = $next(false);
-            str.split_whitespace().map(|it| it.parse::<$t>().unwrap()).collect::<Vec<_>>()
-        }
-    };
-    ($next:expr, [ @vec $t:tt ; $len:expr ]) => {{
-        (0..$len).map(|_| {
-            let line = $next(false);
-            line.split_whitespace()
-                .map(|token| token.parse::<$t>().expect("parse error"))
-                .collect::<Vec<_>>()
-        }).collect::<Vec<_>>()
-    }};
     ($next:expr, [ $t:tt ; $len:expr ]) => {
-        (0..$len as usize).map(|_| read_value!($next, $t)).collect::<Vec<_>>()
+        (0..$len).map(|_| read_value!($next, $t)).collect::<Vec<_>>()
     };
     ($next:expr, chars) => {
         read_value!($next, String).chars().collect::<Vec<char>>()
-    };
-    ($next:expr, bytes) => {
-        read_value!($next, String).into_bytes()
-    };
-    ($next:expr, lines) => {
-        {
-            let mut vec = Vec::new();
-            let mut str = $next(false);
-            while str != "" {
-                vec.push(str);
-                str = $next(false);
-            }
-            vec
-       }
-    };
-    ($next:expr, line) => {
-        $next(false)
     };
     ($next:expr, usize1) => {
         read_value!($next, usize) - 1
     };
     ($next:expr, $t:ty) => {
-        $next(true).parse::<$t>().expect("Parse error")
+        $next().parse::<$t>().expect("Parse error")
     };
 }
-fn chmin<T: PartialOrd + Copy>(a: &mut T, b: T) -> bool {
-    if *a > b {
-        *a = b;
-        true
-    } else {
-        false
-    }
-}
-fn chmax<T: PartialOrd + Copy>(a: &mut T, b: T) -> bool {
-    if *a < b {
-        *a = b;
-        true
-    } else {
-        false
-    }
-}
-pub trait BinarySearch<T> {
-    fn bisect_left(&self, key: T) -> usize;
-    fn bisect_right(&self, key: T) -> usize;
-}
-impl<T> BinarySearch<T> for [T]
-where
-    T: Ord,
-{
-    fn bisect_left(&self, key: T) -> usize {
-        let mut ng = -1 as isize;
-        let mut ok = self.len() as isize;
-        while ok - ng > 1 {
-            let mid = (ok + ng) / 2;
-            if key <= self[mid as usize] {
-                ok = mid;
-            } else {
-                ng = mid;
-            }
-        }
-        ok as usize
-    }
 
-    fn bisect_right(&self, key: T) -> usize {
-        let mut ng = -1 as isize;
-        let mut ok = self.len() as isize;
-        while ok - ng > 1 {
-            let mid = (ok + ng) / 2;
-            if key < self[mid as usize] {
-                ok = mid;
-            } else {
-                ng = mid;
-            }
-        }
-        ok as usize
-    }
-}
-fn mod_pow<T>(x: T, a: T, md: T) -> T
-where
-    T: Copy
-        + From<u8>
-        + std::ops::Mul<Output = T>
-        + std::ops::Rem<Output = T>
-        + std::ops::Shr<u64, Output = T>
-        + std::ops::Add<Output = T>
-        + std::ops::BitAnd<Output = T>
-        + PartialOrd
-        + Default
-        + std::ops::ShrAssign<i32>,
-{
-    let mut res = T::from(1);
-    let mut base = x;
-    let mut ai = a;
+const INF32: i32 = 1_010_101_010;
+const UINF32: u32 = 2_020_202_020;
+const IINF32: i32 = -INF32;
+const INF64: i64 = 4_040_404_040_404_040_404;
+const UINF64: u64 = 8_080_808_080_808_080_808;
+const IINF64: i64 = -INF64;
+const INF128: i128 = i128::MAX / 4;
+const IINF128: i128 = -INF128;
+const MOD1000000007: i64 = 1_000_000_007;
+const MOD998244353: i64 = 998_244_353;
+const MOD: i64 = 998_244_353;
+const UMOD: usize = MOD as usize;
+const PI: f64 = std::f64::consts::PI;
 
-    while ai > T::from(0) {
-        if ai & T::from(1) == T::from(1) {
-            res = res * base % md;
+macro_rules! p {
+    ($($arg:expr),*) => {
+        #[allow(unused_assignments)]
+        {
+            let mut first = true;
+            $(
+                if !first {
+                    print!(" ");
+                }
+                print!("{}", $arg);
+                first = false;
+            )*
+            println!();
         }
-        ai >>= 1;
-        base = (base * base) % md;
+    };
+}
+
+macro_rules! vp {
+    ($x:expr) => {{
+        let mut first = true;
+        for x in &$x {
+            if !first {
+                print!(" ");
+            }
+            print!("{}", x);
+            first = false;
+        }
+        println!();
+    }};
+}
+
+#[cfg(not(atcoder))]
+macro_rules! dprint {
+    ($x:expr) => {
+        eprintln!("{:?}", $x);
+    };
+}
+#[cfg(atcoder)]
+macro_rules! dprint {
+    ($x:expr) => {};
+}
+
+macro_rules! yesno {
+    ($val:expr) => {
+        if $val {
+            println!("Yes");
+        } else {
+            println!("No");
+        }
+    };
+}
+
+fn main() {
+    input! {
+        n: usize,
+        k: usize,
+        a: [usize; n],
     }
-    res
+    let _ = (n, k, a);
 }
